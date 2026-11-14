@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const CLIENT_URL = process.env.CLIENT_URL || 'https://portfolio-frontend-ecru-zeta.vercel.app';
 
 // Security Headers with Helmet
 app.use(helmet());
@@ -17,6 +17,7 @@ app.use(helmet());
 // CORS Configuration
 const allowedOrigins = [
   CLIENT_URL,
+  'https://portfolio-frontend-ecru-zeta.vercel.app',
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:3000',
@@ -29,10 +30,18 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or same-origin)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+
+      // Normalize origin by removing trailing slashes
+      const cleanOrigin = origin.replace(/\/+$/, '');
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (!allowed) return false;
+        return allowed.replace(/\/+$/, '') === cleanOrigin;
+      }) || cleanOrigin.endsWith('.vercel.app');
+
+      if (isAllowed) {
         return callback(null, true);
       }
-      return callback(new Error('CORS policy: Access denied for this origin.'));
+      return callback(new Error(`CORS policy: Access denied for origin ${origin}.`));
     },
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
