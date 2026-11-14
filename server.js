@@ -61,6 +61,15 @@ const sanitize = (str) => {
   return str.replace(/[<>]/g, '').trim();
 };
 
+// Root welcome endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Gagan Kumar Portfolio Backend API is running successfully!',
+    health: '/api/health',
+    contactEndpoint: 'POST /api/contact'
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
