@@ -8,6 +8,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1);
+
+// Normalize URL paths to clean duplicate slashes (e.g. //api/contact -> /api/contact)
+app.use((req, res, next) => {
+  if (req.url && req.url.includes('//')) {
+    req.url = req.url.replace(/\/+/g, '/');
+  }
+  next();
+});
+
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'https://portfolio-frontend-ecru-zeta.vercel.app';
 
@@ -155,7 +165,10 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
       auth: {
         user: emailUser,
         pass: emailPass
-      }
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000
     });
 
     // 4. Construct Email
