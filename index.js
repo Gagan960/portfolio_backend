@@ -225,7 +225,9 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
     console.error('[ERROR sending contact email]:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to send message via Gmail. Please use the direct email link or try again later.'
+      message: 'Failed to send message via Gmail. Please use the direct email link or try again later.',
+      error: error.message,
+      code: error.code || error.responseCode
     });
   }
 });
